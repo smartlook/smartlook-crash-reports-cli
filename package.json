@@ -1,0 +1,29 @@
+{
+  "name": "smartlook-crash-cli-upload",
+  "version": "1.0.0",
+  "description": "CLI tool to upload mapping files to S3 bucket.",
+  "repository": "git@github.com:smartlook/smartlook-crash-cli-upload.git",
+  "author": "smartlook",
+  "main": "lib/index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^16.11.1",
+    "eslint": "^8.0.1",
+    "prettier": "^2.4.1",
+    "prettier-default-config": "^0.2.3",
+    "ts-node": "^10.3.0",
+    "typescript": "^4.4.4"
+  },
+  "bin": {
+    "smartlook-crash-cli-upload": "./bin/run.js",
+    "sccu": "./bin/run.js"
+  },
+  "files": [
+    "/bin",
+    "/lib"
+  ],
+  "dependencies": {
+    "commander": "^8.2.0",
+    "got": "^11.8.2"
+  }
+}
