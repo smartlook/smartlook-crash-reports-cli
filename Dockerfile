@@ -1,35 +1,28 @@
 FROM node:14 as base
 
-ENV HOME /home/node/app
+ENV HOME /home/node/app/smartlook-crash-cli-upload
 
 COPY package.json $HOME/package.json
 COPY yarn.lock $HOME/yarn.lock
 COPY ./bin $HOME/bin
 
-WORKDIR $BUILD_HOME
+WORKDIR $HOME
 
 
 
 FROM base as build
 
-ENV HOME /home/node/app
-
 COPY ./src $HOME/src
+COPY tsconfig.json $HOME/tsconfig.json
 
-RUN yarn --frozen-lockfile --non-interactive --production && yarn cache clean
-# add build
+RUN yarn && yarn build
 
 
 
 FROM base as runtime
 
-# COPY build
-# COPY --from=builder /root/ ./
-# COPY node_modules
-# COPY --from=builder /root/ ./
+COPY --from=build $HOME/lib $HOME/lib
 
-RUN yarn link
+RUN yarn --frozen-lockfile --non-interactive --production && yarn cache clean && yarn link --link-folder ~/.links
 
-CMD ["sccu", "-h"]
-
-ENTRYPOINT [ "sccu" ]
+ENTRYPOINT [ "smartlook-crash-cli-upload" ]
