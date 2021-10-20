@@ -1,5 +1,6 @@
 import * as fs from 'fs'
 import got from "got";
+import FormData from 'form-data'
 
 interface CLIArgs {
     path: string;
@@ -8,19 +9,42 @@ interface CLIArgs {
     internalVersion: string;
 }
 
-export async function uploadMappingFile(args: CLIArgs) {
-    console.log("running upload with args:", args)
-    const readMappingFile = fs.createReadStream(args.path)
-
-    const publicApiUrl = `smartlook-public-api-url/api/v1/releases/${args.appVersion}/mapping-files?force=true`
-    const headers = {authorization: args.token, 'Content-Type': 'multipart', appVersion: args.appVersion}
-    try {
-        await got.stream.post(publicApiUrl, {
-            headers,
-            body: JSON.stringify({internalAppVersion: args.internalVersion, mappingFile: readMappingFile})
-        })
-    } catch (err) {
-        console.log(err)
-        console.log("Streaming mapping file to public API failed")
+function validateInput(args: CLIArgs) {
+    if (!args.path) {
+        throw new Error("Missing path")
     }
+    if (!args.token) {
+        throw new Error("Missing token")
+    }
+    if (!args.appVersion) {
+        throw new Error("Missing App version")
+    }
+    if (!args.internalVersion) {
+        throw new Error("Missing internal App version")
+    }
+
+}
+
+export async function uploadMappingFile(args: CLIArgs) {
+    try {
+        validateInput(args)
+    } catch (e) {
+        console.log(e)
+        return
+    }
+    const readMappingFile = fs.createReadStream(args.path)
+    const form = new FormData()
+    form.append('internalAppVersion', args.internalVersion)
+    form.append('mappingFile', readMappingFile)
+    const publicApiUrl = `https://public-api.alfa.smartlook.cloud/api/v1/releases/${args.appVersion}/mapping-files?force=true`
+    const headers = {'Authorization': `Bearer ${args.token}`, ...form.getHeaders()}
+
+    console.log("Started uploading mapping file")
+    await got.stream.post(publicApiUrl, {
+        headers,
+        body: form
+    }).on('error', (err) => {
+        console.log("Uploading mapping file failed")
+        console.log(err)
+    })
 }
