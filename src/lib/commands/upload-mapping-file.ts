@@ -6,7 +6,7 @@ interface CLIArgs {
     path: string;
     token: string;
     appVersion: string;
-    internalVersion: string;
+    internalAppVersion: string;
 }
 
 function validateInput(args: CLIArgs) {
@@ -19,7 +19,7 @@ function validateInput(args: CLIArgs) {
     if (!args.appVersion) {
         throw new Error("Missing App version")
     }
-    if (!args.internalVersion) {
+    if (!args.internalAppVersion) {
         throw new Error("Missing internal App version")
     }
 
@@ -34,11 +34,10 @@ export async function uploadMappingFile(args: CLIArgs) {
     }
     const readMappingFile = fs.createReadStream(args.path)
     const form = new FormData()
-    form.append('internalAppVersion', args.internalVersion)
+    form.append('internalAppVersion', args.internalAppVersion)
     form.append('mappingFile', readMappingFile)
     const publicApiUrl = `https://public-api.alfa.smartlook.cloud/api/v1/releases/${args.appVersion}/mapping-files?force=true`
     const headers = {'Authorization': `Bearer ${args.token}`, ...form.getHeaders()}
-
     console.log("Started uploading mapping file")
     await got.stream.post(publicApiUrl, {
         headers,
