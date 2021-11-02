@@ -42,7 +42,7 @@ Options:
   -p --path <value>              Path to mapping file to be uploaded. Can be set as ENV variable PATH_TO_MAPING_FILE
   -t --token <value>             API token to access Smartlook Public API. Can be set as ENV variable API_TOKEN
   -av --appVersion <value>       Version of Application related to uploaded mapping file. Can be set as ENV variable APP_VERSION
-  -iv --internalVersion <value>  Internal version of Application related to uploaded mapping file. Can be set as ENV variable INTERNAL_APP_VERSION
+  -iv --internalVersion <value>  Internal version of Application related to uploaded mapping file. Can be set as ENV variable INTERNAL_VERSION
   -h, --help                     display help for command
   
 Example:

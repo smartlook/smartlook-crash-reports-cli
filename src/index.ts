@@ -24,6 +24,7 @@ async function run() {
         .option("-t --token <value>", "API token to access Smartlook Public API. Can be set as ENV variable API_TOKEN", process.env.API_TOKEN)
         .option("-av --appVersion <value>", "Version of Application related to uploaded mapping file. Can be set as ENV variable APP_VERSION", process.env.APP_VERSION)
         .option("-iv --internalVersion <value>", "Internal version of Application related to uploaded mapping file. Can be set as ENV variable INTERNAL_APP_VERSION", process.env.INTERNAL_APP_VERSION)
+        .option("-f --force", "Argument to force the mapping file upload", process.env.FORCE)
         .action(uploadMappingFile)
 
     await cmder.parseAsync(process.argv)
