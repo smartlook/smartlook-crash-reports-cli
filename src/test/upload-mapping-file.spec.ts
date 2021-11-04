@@ -1,11 +1,11 @@
-import {uploadMappingFile, uploadTo} from "../lib/commands/upload-mapping-file";
+import { uploadTo } from "../lib/commands/upload-mapping-file";
 import nock from "nock";
 
 describe('uploadMappingFile', () => {
     const token = 'api-token'
     const path = `${__dirname}/test-mapping-file.txt`
     const appVersion = '0.0.1'
-    const internalVersion = 'beta.1234'
+    const internalAppVersion = 'beta.1234'
     const force = true
 
     describe('uploadTo', () => {

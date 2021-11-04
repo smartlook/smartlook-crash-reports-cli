@@ -6,7 +6,8 @@ interface CLIArgs {
     path: string;
     token: string;
     appVersion: string;
-    internalVersion: string;
+    platform: 'android' | 'ios';
+    internalAppVersion?: string;
     force?: boolean;
 }
 
@@ -20,8 +21,8 @@ function validateInput(args: CLIArgs) {
     if (!args.appVersion) {
         throw new Error("Missing App version")
     }
-    if (!args.internalVersion) {
-        throw new Error("Missing internal App version")
+    if (!args.platform) {
+        throw new Error("Missing platform")
     }
 }
 
@@ -31,7 +32,10 @@ function makeOptions(args: CLIArgs) {
     const form = new FormData()
     const readMappingFile = fs.createReadStream(args.path)
     form.append('mappingFile', readMappingFile)
-    form.append('internalVersion', args.internalVersion)
+
+    if (args.internalAppVersion) {
+        form.append('internalVersion', args.internalAppVersion)
+    }
 
     const headers = {'Authorization': `Bearer ${args.token}`, ...form.getHeaders()}
 
@@ -65,6 +69,6 @@ export async function uploadMappingFile(args: CLIArgs) {
         return
     }
 
-    const publicApiUrl = process.env.ENV === 'DEV' ? `https://public-api.alfa.smartlook.cloud/api/v1/releases/${args.appVersion}/mapping-files` : `prod url`
-    await uploadTo(publicApiUrl, args)
+    const publicApiUrl = process.env.ENV === 'DEV' ? `https://public-api.alfa.smartlook.cloud/api/v1/releases/${args.appVersion}/platforms/${args.platform}/mapping-files` : `prod url`
+    uploadTo(publicApiUrl, args)
 }
