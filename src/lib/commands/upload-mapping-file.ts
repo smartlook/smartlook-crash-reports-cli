@@ -36,7 +36,7 @@ function makeOptions(args: CLIArgs) {
     form.append('mappingFile', readMappingFile)
 
     if (args.internalAppVersion) {
-        form.append('internalVersion', args.internalAppVersion)
+        form.append('internalAppVersion', args.internalAppVersion)
     }
 
     const headers = {'Authorization': `Bearer ${args.token}`, ...form.getHeaders()}
