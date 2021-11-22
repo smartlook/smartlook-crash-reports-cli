@@ -9,6 +9,7 @@ interface CLIArgs {
     token: string;
     appVersion: string;
     platform: 'android' | 'ios';
+    bundleId: string;
     internalAppVersion?: string;
     force?: boolean;
 }
@@ -25,6 +26,9 @@ function validateInput(args: CLIArgs) {
     }
     if (!args.platform) {
         throw new Error("Missing platform")
+    }
+    if (!args.bundleId) {
+        throw new Error("Missing bundleId")
     }
 }
 
@@ -73,7 +77,7 @@ export async function uploadMappingFile(args: CLIArgs): Promise<void> {
         return
     }
 
-    const publicApiUrl = `${HOST}/api/v1/releases/${args.appVersion}/platforms/${args.platform}/mapping-files`
+    const publicApiUrl = `${HOST}/api/v1/bundles/${args.bundleId}/platforms/${args.platform}/releases/${args.appVersion}/mapping-files`
 
     await uploadTo(publicApiUrl, args)
 }

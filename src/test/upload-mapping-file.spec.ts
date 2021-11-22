@@ -4,6 +4,7 @@ import nock from "nock";
 describe('uploadMappingFile', () => {
     const token = 'api-token'
     const path = `${__dirname}/test-mapping-file.txt`
+    const bundleId = 'prod'
     const appVersion = '0.0.1'
     const internalAppVersion = 'beta.1234'
     const force = true
@@ -12,7 +13,7 @@ describe('uploadMappingFile', () => {
 
         it('should send mapping file to public-api', async () => {
             const uploadingNock = nock('https://api.smartlook.cloud', {"encodedQueryParams": true})
-                .post('/api/v1/releases/0.0.1/platforms/android/mapping-files', (body) => {
+                .post('/api/v1/bundles/prod/platforms/android/releases/0.0.1/mapping-files', (body) => {
                     expect(body.toString().includes("content of test mapping file")).toEqual(true)
                     return true
                 })
@@ -26,6 +27,7 @@ describe('uploadMappingFile', () => {
             await uploadMappingFile({
                 token,
                 path,
+                bundleId,
                 appVersion,
                 platform: 'android',
                 internalAppVersion,
