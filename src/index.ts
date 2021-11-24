@@ -22,6 +22,7 @@ async function run() {
         .alias('umf')
         .option("-p --path <value>", "Path to mapping file to be uploaded. Can be set as ENV variable PATH_TO_MAPING_FILE", process.env.PATH_TO_MAPING_FILE)
         .option("-t --token <value>", "API token to access Smartlook Public API. Can be set as ENV variable API_TOKEN", process.env.API_TOKEN)
+        .option("-b --bundleId <value>", "BundleId of Application related to uploaded mapping file. Can be set as ENV variable BUNDLE_ID", process.env.BUNDLE_ID)
         .option("-av --appVersion <value>", "Version of Application related to uploaded mapping file. Can be set as ENV variable APP_VERSION", process.env.APP_VERSION)
         .option("-pl --platform <value>", "Platform of Application related to uploaded mapping file. Supported values are `android` and `ios`. Can be set as ENV variable PLATFORM", process.env.PLATFORM)
         .option("-iv --internalVersion <value>", "Internal version of Application related to uploaded mapping file. Can be set as ENV variable INTERNAL_APP_VERSION", process.env.INTERNAL_APP_VERSION)
