@@ -1,12 +1,15 @@
 import * as fs from 'fs'
-import got from "got";
+import got from 'got'
 import FormData from 'form-data'
+
+const HOST = 'https://api.smartlook.cloud'
 
 interface CLIArgs {
     path: string;
     token: string;
     appVersion: string;
-    internalVersion: string;
+    platform: 'android' | 'ios';
+    internalAppVersion?: string;
     force?: boolean;
 }
 
@@ -20,8 +23,8 @@ function validateInput(args: CLIArgs) {
     if (!args.appVersion) {
         throw new Error("Missing App version")
     }
-    if (!args.internalVersion) {
-        throw new Error("Missing internal App version")
+    if (!args.platform) {
+        throw new Error("Missing platform")
     }
 }
 
@@ -31,7 +34,10 @@ function makeOptions(args: CLIArgs) {
     const form = new FormData()
     const readMappingFile = fs.createReadStream(args.path)
     form.append('mappingFile', readMappingFile)
-    form.append('internalVersion', args.internalVersion)
+
+    if (args.internalAppVersion) {
+        form.append('internalAppVersion', args.internalAppVersion)
+    }
 
     const headers = {'Authorization': `Bearer ${args.token}`, ...form.getHeaders()}
 
@@ -42,22 +48,24 @@ function makeOptions(args: CLIArgs) {
     }
 }
 
-export async function uploadTo(destinationUrl: string, args: CLIArgs) {
+async function uploadTo(destinationUrl: string, args: CLIArgs): Promise<void> {
     const requestOptions = makeOptions(args)
 
     console.log("Started uploading mapping file")
-    const request = await got.stream.post(destinationUrl, requestOptions).on('error', (err) => {
-        console.log("Uploading mapping file failed")
-        console.log(err)
-    }).on('finish', () => {
-        console.log('Uploading file finished');
-    })
+    try {
+      const { body, statusCode } = await got.post(destinationUrl, requestOptions)
 
+      if (statusCode !== 201) {
+        throw new Error(`Uploading mapping file failed with status code ${statusCode}`);
+      }
 
-    request.pipe(process.stdout)
+      console.log('Uplading successfull: ', body)
+    } catch (e) {
+      console.error(e)
+    }
 }
 
-export async function uploadMappingFile(args: CLIArgs) {
+export async function uploadMappingFile(args: CLIArgs): Promise<void> {
     try {
         validateInput(args)
     } catch (e) {
@@ -65,6 +73,7 @@ export async function uploadMappingFile(args: CLIArgs) {
         return
     }
 
-    const publicApiUrl = process.env.ENV === 'DEV' ? `https://public-api.alfa.smartlook.cloud/api/v1/releases/${args.appVersion}/mapping-files` : `prod url`
+    const publicApiUrl = `${HOST}/api/v1/releases/${args.appVersion}/platforms/${args.platform}/mapping-files`
+
     await uploadTo(publicApiUrl, args)
 }
