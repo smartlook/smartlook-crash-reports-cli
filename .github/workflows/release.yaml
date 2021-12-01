@@ -21,7 +21,7 @@ jobs:
       - run: docker build --tag docker.io/smartlook/crash-cli-upload:latest .
       - name: Release
         env:
-          GITHUB_TOKEN: ${{ secrets.UNSAFE_GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           DOCKER_USERNAME: ${{ env.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
