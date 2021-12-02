@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/smartlook/smartlook-crash-cli-upload/compare/v1.0.0...v1.0.1) (2021-12-02)
+
+
+### Bug Fixes
+
+* **workflow:** missing build ([e003184](https://github.com/smartlook/smartlook-crash-cli-upload/commit/e0031843c899089feb0d46fd77811c9e281aeaee))
+
 # 1.0.0 (2021-12-02)
 
 
