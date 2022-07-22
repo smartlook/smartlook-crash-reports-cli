@@ -1,6 +1,6 @@
 {
   "name": "@smartlook/crash-cli-upload",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "CLI tool to upload mapping files to S3 bucket.",
   "repository": "git@github.com:smartlook/smartlook-crash-cli-upload.git",
   "author": "smartlook",
