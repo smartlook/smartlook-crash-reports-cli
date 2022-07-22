@@ -12,10 +12,10 @@ Smartlook Crash CLI Upload is CLI tool that allows to upload source map file to 
 
 - with NPM
 
-  ```npm install -g smartlook-crash-cli-upload```
+  ```npm install --location=global @smartlook/crash-cli-upload```
 - with Yarn
 
-    ```yarn global add smartlook-crash-cli-upload```
+    ```yarn global add @smartlook/crash-cli-upload```
 
 ### Usage
 
