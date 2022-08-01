@@ -17,8 +17,8 @@ describe('uploadMappingFile', () => {
 	const internalAppVersion = 'beta.1234'
 	const force = true
 
-	describe('uploadTo', () => {
-		it('should send mapping file to public-api', async () => {
+	describe('upload', () => {
+		it('should send android mapping file to public-api', async () => {
 			const uploadingNock = nock('https://api.smartlook.cloud', {
 				encodedQueryParams: true,
 			})
@@ -51,7 +51,7 @@ describe('uploadMappingFile', () => {
 			expect(uploadingNock.isDone()).toBeTruthy()
 		})
 
-		it('should send mapping file to public-api', async () => {
+		it('should send ios dsyms from .xcarchive to public-api', async () => {
 			const uploadingNock = nock('https://api.smartlook.cloud', {
 				encodedQueryParams: true,
 			})

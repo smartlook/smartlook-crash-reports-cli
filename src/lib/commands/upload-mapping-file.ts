@@ -69,6 +69,7 @@ function makeOptions(
 		body: form,
 	}
 }
+
 async function uploadAndroid(
 	destinationUrl: string,
 	args: CLIArgs
