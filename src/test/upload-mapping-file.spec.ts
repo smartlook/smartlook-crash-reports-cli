@@ -11,7 +11,8 @@ const hexToString = (hex: any) => {
 describe('uploadMappingFile', () => {
 	const token = 'api-token'
 	const path = `${__dirname}/test-mapping-file.txt`
-	const dsymPath = `${__dirname}/test.xcarchive`
+	const dsymArchivePath = `${__dirname}/test.xcarchive`
+	const dsymPath = `${__dirname}/test.xcarchive/dSYMs/SmartlookAnalytics.framework.dSYM/Contents/Resources/DWARF/SmartlookAnalytics`
 	const bundleId = 'prod'
 	const appVersion = '0.0.1'
 	const internalAppVersion = 'beta.1234'
@@ -59,11 +60,42 @@ describe('uploadMappingFile', () => {
 					'/api/v1/bundles/prod/platforms/ios/releases/0.0.1/mapping-files',
 					(body) => {
 						expect(
-							// Multipart will be hex encoded by default, need to decode it
+							// Multipart with files will be hex encoded by default, need to decode it
 							hexToString(body).includes(
 								'Content-Disposition: form-data; name="mappingFile"'
 							)
 						).toBeTruthy()
+						return true
+					}
+				)
+				.query({ force: 'true' })
+				.reply(201, {
+					oid: 'oid',
+					createdAt: new Date('2021-09-10'),
+					state: 'completed',
+				})
+
+			await uploadMappingFile({
+				token,
+				path: dsymArchivePath,
+				bundleId,
+				appVersion,
+				platform: 'ios',
+				internalAppVersion,
+				force,
+			})
+
+			expect(uploadingNock.isDone()).toBeTruthy()
+		})
+
+		it('should send single ios dsym to public-api', async () => {
+			const uploadingNock = nock('https://api.smartlook.cloud', {
+				encodedQueryParams: true,
+			})
+				.post(
+					'/api/v1/bundles/prod/platforms/ios/releases/0.0.1/mapping-files',
+					(body) => {
+						expect(body.includes('smartlook test')).toBeTruthy()
 						return true
 					}
 				)

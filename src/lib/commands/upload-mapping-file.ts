@@ -70,7 +70,16 @@ function makeOptions(
 	}
 }
 
-async function uploadAndroid(
+async function uploadIos(destinationUrl: string, args: CLIArgs): Promise<void> {
+	const stats = await fs.promises.stat(args.path)
+	if (stats.isDirectory()) {
+		await uploadIosArchive(destinationUrl, args)
+		return
+	}
+	await uploadSingleFile(destinationUrl, args)
+}
+
+async function uploadSingleFile(
 	destinationUrl: string,
 	args: CLIArgs
 ): Promise<void> {
@@ -78,7 +87,10 @@ async function uploadAndroid(
 	await upload(destinationUrl, requestOptions)
 }
 
-async function uploadIos(destinationUrl: string, args: CLIArgs): Promise<void> {
+async function uploadIosArchive(
+	destinationUrl: string,
+	args: CLIArgs
+): Promise<void> {
 	const archive = archiver('zip', {
 		zlib: { level: 6 },
 	})
@@ -136,9 +148,9 @@ export async function uploadMappingFile(args: CLIArgs): Promise<void> {
 
 	const publicApiUrl = `${HOST}/api/v1/bundles/${args.bundleId}/platforms/${args.platform}/releases/${args.appVersion}/mapping-files`
 
-	if (args.platform === 'android') {
-		await uploadAndroid(publicApiUrl, args)
-	} else {
+	if (args.platform === 'ios') {
 		await uploadIos(publicApiUrl, args)
+	} else {
+		await uploadSingleFile(publicApiUrl, args)
 	}
 }
