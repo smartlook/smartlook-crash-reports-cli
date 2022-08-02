@@ -12,7 +12,7 @@ describe('uploadMappingFile', () => {
 	const token = 'api-token'
 	const path = `${__dirname}/test-mapping-file.txt`
 	const dsymArchivePath = `${__dirname}/test.xcarchive`
-	const dsymPath = `${__dirname}/test.xcarchive/dSYMs/SmartlookAnalytics.framework.dSYM/Contents/Resources/DWARF/SmartlookAnalytics`
+	const dsymPath = `${__dirname}/test.xcarchive/dSYMs/SmartlookAnalytics.framework.dSYM`
 	const bundleId = 'prod'
 	const appVersion = '0.0.1'
 	const internalAppVersion = 'beta.1234'
@@ -95,7 +95,11 @@ describe('uploadMappingFile', () => {
 				.post(
 					'/api/v1/bundles/prod/platforms/ios/releases/0.0.1/mapping-files',
 					(body) => {
-						expect(body.includes('smartlook test')).toBeTruthy()
+						expect(
+							hexToString(body).includes(
+								'Content-Disposition: form-data; name="mappingFile"'
+							)
+						).toBeTruthy()
 						return true
 					}
 				)

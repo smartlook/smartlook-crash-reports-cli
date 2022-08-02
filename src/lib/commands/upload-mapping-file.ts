@@ -70,16 +70,7 @@ function makeOptions(
 	}
 }
 
-async function uploadIos(destinationUrl: string, args: CLIArgs): Promise<void> {
-	const stats = await fs.promises.stat(args.path)
-	if (stats.isDirectory()) {
-		await uploadIosArchive(destinationUrl, args)
-		return
-	}
-	await uploadSingleFile(destinationUrl, args)
-}
-
-async function uploadSingleFile(
+async function uploadAndroid(
 	destinationUrl: string,
 	args: CLIArgs
 ): Promise<void> {
@@ -87,17 +78,20 @@ async function uploadSingleFile(
 	await upload(destinationUrl, requestOptions)
 }
 
-async function uploadIosArchive(
-	destinationUrl: string,
-	args: CLIArgs
-): Promise<void> {
+async function uploadIos(destinationUrl: string, args: CLIArgs): Promise<void> {
 	const archive = archiver('zip', {
 		zlib: { level: 6 },
 	})
 
-	archive.glob('**/DWARF/*', {
-		cwd: args.path,
-	})
+	if (args.path.endsWith('.dSYM')) {
+		// We want the dSYM name as root folder
+		const dsymName = args.path.split('/').pop()
+		archive.directory(args.path, dsymName || false)
+	} else {
+		archive.glob('**/*.dSYM/**', {
+			cwd: args.path,
+		})
+	}
 
 	await new Promise((resolve, reject) => {
 		archive.on('finish', async () => {
@@ -107,12 +101,11 @@ async function uploadIosArchive(
 				await upload(destinationUrl, requestOptions)
 				resolve(true)
 			} catch (e) {
-				console.log(e)
-				reject()
+				reject(e)
 			}
 		})
 
-		archive.on('error', (err) => reject)
+		archive.on('error', (e: Error) => reject(e))
 
 		archive.finalize()
 	})
@@ -132,7 +125,7 @@ async function upload(
 			)
 		}
 
-		console.log('Uplading successfull: ', body)
+		console.log('Uploading successfull: ', body)
 	} catch (e) {
 		throw new Error('Uploading failed')
 	}
@@ -148,9 +141,14 @@ export async function uploadMappingFile(args: CLIArgs): Promise<void> {
 
 	const publicApiUrl = `${HOST}/api/v1/bundles/${args.bundleId}/platforms/${args.platform}/releases/${args.appVersion}/mapping-files`
 
-	if (args.platform === 'ios') {
-		await uploadIos(publicApiUrl, args)
-	} else {
-		await uploadSingleFile(publicApiUrl, args)
+	switch (args.platform) {
+		case 'android':
+			await uploadAndroid(publicApiUrl, args)
+			break
+		case 'ios':
+			await uploadIos(publicApiUrl, args)
+			break
+		default:
+			throw new Error('Unknown platform')
 	}
 }
