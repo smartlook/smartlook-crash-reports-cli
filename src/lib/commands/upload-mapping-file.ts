@@ -1,9 +1,16 @@
-import * as fs from 'fs'
-import got from 'got'
-import FormData from 'form-data'
 import archiver from 'archiver'
+import * as fs from 'fs'
+import FormData from 'form-data'
+import got from 'got'
+import * as plist from 'plist'
 
 const HOST = 'https://api.smartlook.cloud'
+
+interface AppIdentifiers {
+	appVersion?: string
+	bundleId?: string
+	internalAppVersion?: string
+}
 
 interface CLIArgs {
 	path: string
@@ -21,21 +28,49 @@ interface RequestOptions {
 	headers: Record<string, string>
 }
 
-function validateInput(args: CLIArgs) {
+interface InfoPlistFile {
+	ApplicationProperties?: {
+		CFBundleIdentifier?: string
+		CFBundleShortVersionString?: string
+		CFBundleVersion?: string
+	}
+}
+
+const isXcarchive = (path: string) => !path.endsWith('.dSYM')
+
+function validateInput(args: CLIArgs, isXcarchive: boolean) {
 	if (!args.path) {
 		throw new Error('Missing path')
 	}
 	if (!args.token) {
 		throw new Error('Missing token')
 	}
-	if (!args.appVersion) {
+	if (!args.appVersion && !isXcarchive) {
 		throw new Error('Missing App version')
 	}
 	if (!args.platform) {
 		throw new Error('Missing platform')
 	}
-	if (!args.bundleId) {
+	if (!args.bundleId && !isXcarchive) {
 		throw new Error('Missing bundleId')
+	}
+}
+
+async function parseIdentifiersFromPlist(
+	path: string
+): Promise<AppIdentifiers | null> {
+	try {
+		const infoPlistFile = await fs.promises.readFile(`${path}/Info.plist`)
+
+		const parsed = plist.parse(infoPlistFile.toString()) as InfoPlistFile
+		return {
+			appVersion: parsed?.ApplicationProperties?.CFBundleShortVersionString,
+			internalAppVersion: parsed?.ApplicationProperties?.CFBundleVersion,
+			bundleId: parsed?.ApplicationProperties?.CFBundleIdentifier,
+		}
+	} catch (e) {
+		console.log(e)
+		return null
 	}
 }
 
@@ -83,7 +118,7 @@ async function uploadIos(destinationUrl: string, args: CLIArgs): Promise<void> {
 		zlib: { level: 6 },
 	})
 
-	if (args.path.endsWith('.dSYM')) {
+	if (!isXcarchive(args.path)) {
 		// We want the dSYM name as root folder
 		const dsymName = args.path.split('/').pop()
 		archive.directory(args.path, dsymName || false)
@@ -133,10 +168,13 @@ async function upload(
 
 export async function uploadMappingFile(args: CLIArgs): Promise<void> {
 	try {
-		validateInput(args)
+		validateInput(args, isXcarchive(args.path))
 	} catch (e) {
 		console.log(e)
 		return
+	}
+
+	if (args.platform === 'ios') {
 	}
 
 	const publicApiUrl = `${HOST}/api/v1/bundles/${args.bundleId}/platforms/${args.platform}/releases/${args.appVersion}/mapping-files`

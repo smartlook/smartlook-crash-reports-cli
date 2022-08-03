@@ -52,7 +52,7 @@ describe('uploadMappingFile', () => {
 			expect(uploadingNock.isDone()).toBeTruthy()
 		})
 
-		it('should send ios dsyms from .xcarchive to public-api', async () => {
+		fit('should send ios dsyms from .xcarchive to public-api', async () => {
 			const uploadingNock = nock('https://api.smartlook.cloud', {
 				encodedQueryParams: true,
 			})
