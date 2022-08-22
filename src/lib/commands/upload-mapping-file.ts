@@ -3,6 +3,7 @@ import * as fs from 'fs'
 import FormData from 'form-data'
 import got from 'got'
 import * as plist from 'plist'
+import glob from 'glob'
 
 const HOST = 'https://api.smartlook.cloud'
 
@@ -36,23 +37,33 @@ interface InfoPlistFile {
 	}
 }
 
-const isXcarchive = (path: string) => !path.endsWith('.dSYM')
+const isXcarchive = (path: string): boolean => !!path.match(/\.xcarchive$/)
 
-function validateInput(args: CLIArgs, isXcarchive: boolean) {
+function validateInput(args: CLIArgs) {
+	if (!args.platform) {
+		throw new Error('Missing path')
+	}
 	if (!args.path) {
 		throw new Error('Missing path')
 	}
 	if (!args.token) {
 		throw new Error('Missing token')
 	}
-	if (!args.appVersion && !isXcarchive) {
+	if (!args.appVersion) {
 		throw new Error('Missing App version')
 	}
-	if (!args.platform) {
-		throw new Error('Missing platform')
-	}
-	if (!args.bundleId && !isXcarchive) {
+	if (!args.bundleId) {
 		throw new Error('Missing bundleId')
+	}
+}
+
+function mergeArgs(args: CLIArgs, identifiers: AppIdentifiers | null): CLIArgs {
+	return {
+		...args,
+		appVersion: args.appVersion ?? identifiers?.appVersion,
+		internalAppVersion:
+			args.internalAppVersion ?? identifiers?.internalAppVersion,
+		bundleId: args.bundleId ?? identifiers?.bundleId,
 	}
 }
 
@@ -76,19 +87,21 @@ async function parseIdentifiersFromPlist(
 
 function makeOptions(
 	args: CLIArgs,
-	zipFile?: archiver.Archiver
+	packedDsyms?: archiver.Archiver[]
 ): RequestOptions {
 	const searchParams = { force: args.force == true ? 'true' : 'false' }
 	const form = new FormData()
 
-	const readMappingFile = zipFile || fs.createReadStream(args.path)
-
-	form.append(
-		'mappingFile',
-		readMappingFile,
-		zipFile ? { knownLength: zipFile.pointer() } : undefined
-	)
-
+	if (args.platform === 'android') {
+		const readMappingFile = fs.createReadStream(args.path)
+		form.append('mappingFile', readMappingFile)
+	} else {
+		packedDsyms?.forEach((dsym, index) => {
+			form.append(`mappingFile-${index + 1}`, dsym, {
+				knownLength: dsym.pointer(),
+			})
+		})
+	}
 	if (args.internalAppVersion) {
 		form.append('internalAppVersion', args.internalAppVersion)
 	}
@@ -113,37 +126,55 @@ async function uploadAndroid(
 	await upload(destinationUrl, requestOptions)
 }
 
-async function uploadIos(destinationUrl: string, args: CLIArgs): Promise<void> {
-	const archive = archiver('zip', {
-		zlib: { level: 6 },
-	})
-
-	if (!isXcarchive(args.path)) {
-		// We want the dSYM name as root folder
-		const dsymName = args.path.split('/').pop()
-		archive.directory(args.path, dsymName || false)
-	} else {
-		archive.glob('**/*.dSYM/**', {
-			cwd: args.path,
-		})
-	}
-
-	await new Promise((resolve, reject) => {
-		archive.on('finish', async () => {
-			const requestOptions = makeOptions(args, archive)
-
-			try {
-				await upload(destinationUrl, requestOptions)
-				resolve(true)
-			} catch (e) {
-				reject(e)
+async function getDsymPaths(path: string): Promise<string[]> {
+	const dsymPaths = await new Promise<string[]>((resolve, reject) => {
+		glob('**/*.dSYM', { cwd: path }, (err, dirs) => {
+			if (err) {
+				reject(err)
 			}
-		})
 
+			resolve(dirs)
+		})
+	})
+	return dsymPaths
+}
+
+async function packDsym(dsymPath: string): Promise<archiver.Archiver> {
+	const archive = archiver('tar', { gzip: true })
+	const dsymName = dsymPath.split('/').pop()
+	console.log(dsymPath)
+
+	archive.directory(`${dsymPath}`, dsymName || false)
+
+	return await new Promise((resolve, reject) => {
+		archive.on('finish', async () => resolve(archive))
 		archive.on('error', (e: Error) => reject(e))
 
 		archive.finalize()
 	})
+}
+
+async function uploadIos(destinationUrl: string, args: CLIArgs): Promise<void> {
+	let gzippedDsyms: archiver.Archiver[] = []
+
+	if (!isXcarchive(args.path)) {
+		gzippedDsyms.push(await packDsym(args.path))
+	} else {
+		const dsymPaths = await getDsymPaths(args.path)
+		const promises = dsymPaths.map(async (dsymPath) =>
+			packDsym(`${args.path}/${dsymPath}`)
+		)
+		gzippedDsyms = await Promise.all(promises)
+	}
+
+	const requestOptions = makeOptions(args, gzippedDsyms)
+
+	try {
+		await upload(destinationUrl, requestOptions)
+	} catch (e) {
+		console.log(e)
+		throw e
+	}
 }
 
 async function upload(
@@ -168,13 +199,14 @@ async function upload(
 
 export async function uploadMappingFile(args: CLIArgs): Promise<void> {
 	try {
-		validateInput(args, isXcarchive(args.path))
+		if (args.platform === 'ios' && isXcarchive(args.path)) {
+			const appIdentifiers = await parseIdentifiersFromPlist(args.path)
+			args = mergeArgs(args, appIdentifiers)
+		}
+		validateInput(args)
 	} catch (e) {
 		console.log(e)
 		return
-	}
-
-	if (args.platform === 'ios') {
 	}
 
 	const publicApiUrl = `${HOST}/api/v1/bundles/${args.bundleId}/platforms/${args.platform}/releases/${args.appVersion}/mapping-files`
