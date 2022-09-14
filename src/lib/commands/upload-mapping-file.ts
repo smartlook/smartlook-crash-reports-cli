@@ -99,6 +99,7 @@ function makeOptions(
 		packedDsyms?.forEach((dsym, index) => {
 			form.append(`mappingFile-${index + 1}`, dsym, {
 				knownLength: dsym.pointer(),
+				contentType: 'application/gzip',
 			})
 		})
 	}
@@ -142,7 +143,6 @@ async function getDsymPaths(path: string): Promise<string[]> {
 async function packDsym(dsymPath: string): Promise<archiver.Archiver> {
 	const archive = archiver('tar', { gzip: true })
 	const dsymName = dsymPath.split('/').pop()
-	console.log(dsymPath)
 
 	archive.directory(`${dsymPath}`, dsymName || false)
 
@@ -205,7 +205,7 @@ export async function uploadMappingFile(args: CLIArgs): Promise<void> {
 		}
 		validateInput(args)
 	} catch (e) {
-		console.log(e)
+		console.error(e)
 		return
 	}
 
