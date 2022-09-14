@@ -39,7 +39,7 @@ Aliases:
 Usage: smartlook-crash-cli-upload upload-mapping-file|umf [options]
 
 Options:
-  -p --path <value>              Path to mapping file to be uploaded. Can be set as ENV variable PATH_TO_MAPING_FILE
+  -p --path <value>              Path to mapping file to be uploaded - for iOS either path to.xcarchive or single dSYM file. Can be set as ENV variable PATH_TO_MAPING_FILE
   -t --token <value>             API token to access Smartlook Public API. Can be set as ENV variable API_TOKEN
   -b --bundleId <value>          BundleId of Application related to uploaded mapping file. Can be set as ENV variable BUNDLE_ID
   -pl --platform <value>         Platform of Application related to uploaded mapping file. Supported values are `android` and `ios`. Can be set as ENV variable PLATFORM
