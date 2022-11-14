@@ -54,7 +54,7 @@ describe('uploadMappingFile', () => {
 			expect(uploadingNock.isDone()).toBeTruthy()
 		})
 
-		it('should send ios dsyms from .xcarchive to public-api', async () => {
+		it('should send apple dsyms from .xcarchive to public-api', async () => {
 			const uploadingNock = nock('https://api.smartlook.cloud', {
 				encodedQueryParams: true,
 			})
@@ -87,7 +87,7 @@ describe('uploadMappingFile', () => {
 				bundleId,
 				appVersion,
 				apiHost,
-				platform: 'ios',
+				platform: 'apple',
 				internalAppVersion,
 				force,
 			})
@@ -95,7 +95,7 @@ describe('uploadMappingFile', () => {
 			expect(uploadingNock.isDone()).toBeTruthy()
 		})
 
-		it('should send ios dsyms from .xcarchive to public-api and parse appVersion from Info.plist', async () => {
+		it('should send apple dsyms from .xcarchive to public-api and parse appVersion from Info.plist', async () => {
 			const uploadingNock = nock('https://api.smartlook.cloud', {
 				encodedQueryParams: true,
 			})
@@ -127,7 +127,7 @@ describe('uploadMappingFile', () => {
 				bundleId,
 				appVersion: undefined as unknown as string,
 				apiHost,
-				platform: 'ios',
+				platform: 'apple',
 				internalAppVersion,
 				force,
 			})
@@ -135,7 +135,7 @@ describe('uploadMappingFile', () => {
 			expect(uploadingNock.isDone()).toBeTruthy()
 		})
 
-		it('should send single ios dsym to public-api', async () => {
+		it('should send single apple dsym to public-api', async () => {
 			const uploadingNock = nock('https://api.smartlook.cloud', {
 				encodedQueryParams: true,
 			})
@@ -163,7 +163,7 @@ describe('uploadMappingFile', () => {
 				bundleId,
 				appVersion,
 				apiHost,
-				platform: 'ios',
+				platform: 'apple',
 				internalAppVersion,
 				force,
 			})

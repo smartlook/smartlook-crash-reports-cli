@@ -40,19 +40,19 @@ const isXcarchive = (path: string): boolean => !!path.match(/\.xcarchive$/)
 
 function validateInput(args: CLIArgs) {
 	if (!args.platform) {
-		throw new Error('Missing path')
+		throw new Error('Missing argument "platform"')
 	}
 	if (!args.path) {
-		throw new Error('Missing path')
+		throw new Error('Missing argument "path"')
 	}
 	if (!args.token) {
-		throw new Error('Missing token')
+		throw new Error('Missing argument "token"')
 	}
 	if (!args.appVersion) {
-		throw new Error('Missing App version')
+		throw new Error('Missing argument "appVersion"')
 	}
 	if (!args.bundleId) {
-		throw new Error('Missing bundleId')
+		throw new Error('Missing argument "bundleId"')
 	}
 }
 
@@ -199,6 +199,20 @@ async function upload(
 	}
 }
 
+function buildApiURL(
+	apiHost: string,
+	bundleId: string,
+	platform: 'apple' | 'android',
+	appVersion: string
+) {
+	const platformMap = {
+		apple: 'ios',
+		android: 'android',
+	}
+
+	return `${apiHost}/api/v1/bundles/${bundleId}/platforms/${platformMap[platform]}/releases/${appVersion}/mapping-files`
+}
+
 export async function uploadMappingFile(args: CLIArgs): Promise<void> {
 	try {
 		if (args.platform === 'apple' && isXcarchive(args.path)) {
@@ -211,7 +225,12 @@ export async function uploadMappingFile(args: CLIArgs): Promise<void> {
 		return
 	}
 
-	const publicApiUrl = `${args.apiHost}/api/v1/bundles/${args.bundleId}/platforms/${args.platform}/releases/${args.appVersion}/mapping-files`
+	const publicApiUrl = buildApiURL(
+		args.apiHost,
+		args.bundleId,
+		args.platform,
+		args.appVersion
+	)
 
 	switch (args.platform) {
 		case 'android':
