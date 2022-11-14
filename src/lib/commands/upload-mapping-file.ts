@@ -16,7 +16,7 @@ interface CLIArgs {
 	token: string
 	appVersion: string
 	apiHost: string
-	platform: 'android' | 'ios'
+	platform: 'android' | 'apple'
 	bundleId: string
 	internalAppVersion?: string
 	force?: boolean
@@ -153,7 +153,10 @@ async function packDsym(dsymPath: string): Promise<archiver.Archiver> {
 	})
 }
 
-async function uploadIos(destinationUrl: string, args: CLIArgs): Promise<void> {
+async function uploadApple(
+	destinationUrl: string,
+	args: CLIArgs
+): Promise<void> {
 	let gzippedDsyms: archiver.Archiver[] = []
 
 	if (!isXcarchive(args.path)) {
@@ -198,7 +201,7 @@ async function upload(
 
 export async function uploadMappingFile(args: CLIArgs): Promise<void> {
 	try {
-		if (args.platform === 'ios' && isXcarchive(args.path)) {
+		if (args.platform === 'apple' && isXcarchive(args.path)) {
 			const appIdentifiers = await parseIdentifiersFromPlist(args.path)
 			args = mergeArgs(args, appIdentifiers)
 		}
@@ -214,10 +217,10 @@ export async function uploadMappingFile(args: CLIArgs): Promise<void> {
 		case 'android':
 			await uploadAndroid(publicApiUrl, args)
 			break
-		case 'ios':
-			await uploadIos(publicApiUrl, args)
+		case 'apple':
+			await uploadApple(publicApiUrl, args)
 			break
 		default:
-			throw new Error('Unknown platform')
+			throw new Error(`Unknown platform: "${args.platform}"`)
 	}
 }
