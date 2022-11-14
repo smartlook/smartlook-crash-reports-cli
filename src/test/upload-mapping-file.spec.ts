@@ -17,6 +17,7 @@ describe('uploadMappingFile', () => {
 	const appVersion = '0.0.1'
 	const internalAppVersion = 'beta.1234'
 	const force = true
+	const apiHost = 'https://api.smartlook.cloud'
 
 	describe('upload', () => {
 		it('should send android mapping file to public-api', async () => {
@@ -44,6 +45,7 @@ describe('uploadMappingFile', () => {
 				path,
 				bundleId,
 				appVersion,
+				apiHost,
 				platform: 'android',
 				internalAppVersion,
 				force,
@@ -84,6 +86,7 @@ describe('uploadMappingFile', () => {
 				path: dsymArchivePath,
 				bundleId,
 				appVersion,
+				apiHost,
 				platform: 'ios',
 				internalAppVersion,
 				force,
@@ -123,6 +126,7 @@ describe('uploadMappingFile', () => {
 				path: dsymArchivePath,
 				bundleId,
 				appVersion: undefined as unknown as string,
+				apiHost,
 				platform: 'ios',
 				internalAppVersion,
 				force,
@@ -158,6 +162,7 @@ describe('uploadMappingFile', () => {
 				path: dsymPath,
 				bundleId,
 				appVersion,
+				apiHost,
 				platform: 'ios',
 				internalAppVersion,
 				force,

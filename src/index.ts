@@ -55,10 +55,14 @@ async function run() {
 			'Argument to force the mapping file upload',
 			process.env.FORCE
 		)
+		.option(
+			'-a --apiHost',
+			'URL of REST API for uploading mapping files',
+			process.env.API_HOST ?? 'https://api.smartlook.cloud'
+		)
 		.action(uploadMappingFile)
 
 	await cmder.parseAsync(process.argv)
 }
 
 export default run
-

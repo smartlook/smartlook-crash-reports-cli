@@ -5,8 +5,6 @@ import got from 'got'
 import * as plist from 'plist'
 import glob from 'glob'
 
-const HOST = 'https://api.smartlook.cloud'
-
 interface AppIdentifiers {
 	appVersion?: string
 	bundleId?: string
@@ -17,6 +15,7 @@ interface CLIArgs {
 	path: string
 	token: string
 	appVersion: string
+	apiHost: string
 	platform: 'android' | 'ios'
 	bundleId: string
 	internalAppVersion?: string
@@ -209,7 +208,7 @@ export async function uploadMappingFile(args: CLIArgs): Promise<void> {
 		return
 	}
 
-	const publicApiUrl = `${HOST}/api/v1/bundles/${args.bundleId}/platforms/${args.platform}/releases/${args.appVersion}/mapping-files`
+	const publicApiUrl = `${args.apiHost}/api/v1/bundles/${args.bundleId}/platforms/${args.platform}/releases/${args.appVersion}/mapping-files`
 
 	switch (args.platform) {
 		case 'android':
