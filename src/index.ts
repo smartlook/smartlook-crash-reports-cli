@@ -21,6 +21,11 @@ async function run() {
 		.command('upload-mapping-file')
 		.alias('umf')
 		.option(
+			'-a --apiHost <value>',
+			'URL of REST API for uploading mapping files',
+			process.env.API_HOST ?? 'https://api.smartlook.cloud'
+		)
+		.option(
 			'-p --path <value>',
 			'Path to mapping file to be uploaded - for iOS either path to.xcarchive or single dSYM file. Can be set as ENV variable PATH_TO_MAPING_FILE',
 			process.env.PATH_TO_MAPING_FILE
@@ -54,11 +59,6 @@ async function run() {
 			'-f --force',
 			'Argument to force the mapping file upload',
 			process.env.FORCE
-		)
-		.option(
-			'-a --apiHost',
-			'URL of REST API for uploading mapping files',
-			process.env.API_HOST ?? 'https://api.smartlook.cloud'
 		)
 		.action(uploadMappingFile)
 

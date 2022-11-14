@@ -159,9 +159,11 @@ async function uploadApple(
 ): Promise<void> {
 	let gzippedDsyms: archiver.Archiver[] = []
 
+	console.log('Packing files for the upload...')
 	if (!isXcarchive(args.path)) {
 		gzippedDsyms.push(await packDsym(args.path))
 	} else {
+		console.log('Xcarchive deteted - looking for dSYMs')
 		const dsymPaths = await getDsymPaths(args.path)
 		const promises = dsymPaths.map(async (dsymPath) =>
 			packDsym(`${args.path}/${dsymPath}`)
@@ -183,19 +185,19 @@ async function upload(
 	destinationUrl: string,
 	requestOptions: RequestOptions
 ): Promise<void> {
-	console.log('Started uploading mapping file')
+	console.log('Uploading mapping file')
 	try {
 		const { body, statusCode } = await got.post(destinationUrl, requestOptions)
 
 		if (statusCode !== 201) {
 			throw new Error(
-				`Uploading mapping file failed with status code ${statusCode}`
+				`Upload of mapping file failed with status code ${statusCode}`
 			)
 		}
 
-		console.log('Uploading successfull: ', body)
+		console.log('Upload was successfull: ', body)
 	} catch (e) {
-		throw new Error('Uploading failed')
+		console.error('Upload failed', e)
 	}
 }
 
@@ -231,6 +233,8 @@ export async function uploadMappingFile(args: CLIArgs): Promise<void> {
 		args.platform,
 		args.appVersion
 	)
+
+	console.log(`Upload URL: ${publicApiUrl}`)
 
 	switch (args.platform) {
 		case 'android':
