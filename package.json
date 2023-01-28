@@ -51,7 +51,7 @@
 		"typescript": "^4.9.4"
 	},
 	"bin": {
-		"smartlook-crash-cli-upload": "./build/index.js"
+		"smartlook-crash-reports": "./build/index.js"
 	},
 	"pkg": {
 		"scripts": "dist/index.js",
