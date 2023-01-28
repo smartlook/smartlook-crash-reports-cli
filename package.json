@@ -1,50 +1,71 @@
 {
-  "name": "@smartlook/crash-cli-upload",
-  "version": "1.1.0",
-  "description": "CLI tool to upload mapping files to S3 bucket.",
-  "repository": "git@github.com:smartlook/smartlook-crash-cli-upload.git",
-  "author": "smartlook",
-  "main": "lib/index.js",
-  "license": "MIT",
-  "scripts": {
-    "build": "rimraf lib && tsc -b",
-    "test": "jest"
-  },
-  "dependencies": {
-    "@types/archiver": "^5.3.1",
-    "@types/glob": "^7.2.0",
-    "archiver": "^5.3.1",
-    "commander": "^8.2.0",
-    "form-data": "^4.0.0",
-    "glob": "^8.0.3",
-    "got": "^11.8.2",
-    "plist": "^3.0.6"
-  },
-  "devDependencies": {
-    "@semantic-release-plus/docker": "^3.1.0",
-    "@semantic-release/changelog": "^6.0.1",
-    "@semantic-release/git": "^10.0.1",
-    "@semantic-release/npm": "^8.0.3",
-    "@types/got": "^9.6.12",
-    "@types/jest": "^27.0.2",
-    "@types/node": "^16.11.1",
-    "@types/plist": "^3.0.2",
-    "eslint": "^8.0.1",
-    "jest": "^27.3.1",
-    "nock": "^13.1.4",
-    "prettier": "^2.4.1",
-    "prettier-default-config": "^0.2.3",
-    "rimraf": "^3.0.2",
-    "semantic-release": "^18.0.1",
-    "ts-jest": "^27.0.7",
-    "ts-node": "^10.3.0",
-    "typescript": "^4.4.4"
-  },
-  "bin": {
-    "smartlook-crash-cli-upload": "./bin/run.js"
-  },
-  "files": [
-    "/bin",
-    "/lib"
-  ]
+	"name": "@smartlook/smartlook-crash-reports-cli",
+	"version": "1.1.0",
+	"type": "commonjs",
+	"description": "CLI tool to upload mapping files to Smartlook.",
+	"repository": "git@github.com:smartlook/smartlook-crash-cli-upload.git",
+	"author": "smartlook",
+	"main": "./build/index.js",
+	"license": "MIT",
+	"scripts": {
+		"build": "make build-ts",
+		"test": "jest"
+	},
+	"dependencies": {
+		"@types/archiver": "^5.3.1",
+		"@types/form-data": "^2.5.0",
+		"@types/glob": "^8.0.0",
+		"archiver": "^5.3.1",
+		"axios": "^0.27.2",
+		"chalk": "^5.2.0",
+		"commander": "^10.0.0",
+		"debug": "^4.3.4",
+		"form-data": "^4.0.0",
+		"glob": "^8.1.0",
+		"got": "^12.5.3",
+		"plist": "^3.0.6"
+	},
+	"devDependencies": {
+		"@rollup/plugin-commonjs": "^24.0.1",
+		"@rollup/plugin-json": "^6.0.0",
+		"@semantic-release-plus/docker": "^3.1.0",
+		"@semantic-release/changelog": "^6.0.1",
+		"@semantic-release/git": "^10.0.1",
+		"@semantic-release/npm": "^9.0.2",
+		"@types/debug": "^4.1.7",
+		"@types/got": "^9.6.12",
+		"@types/jest": "^29.2.5",
+		"@types/node": "^18.11.18",
+		"@types/plist": "^3.0.2",
+		"eslint": "^8.32.0",
+		"jest": "^29.3.1",
+		"nock": "^13.1.4",
+		"pkg": "^5.8.0",
+		"prettier": "^2.8.3",
+		"prettier-default-config": "^0.2.3",
+		"rimraf": "^4.0.7",
+		"rollup": "^3.12.0",
+		"semantic-release": "^20.0.2",
+		"ts-jest": "^29.0.5",
+		"ts-node": "^10.9.1",
+		"typescript": "^4.9.4"
+	},
+	"bin": {
+		"smartlook-crash-cli-upload": "./build/index.js"
+	},
+	"pkg": {
+		"scripts": "dist/index.js",
+		"targets": [
+			"node18-linux-arm64",
+			"node18-macos-arm64",
+			"node18-win-arm64",
+			"node18-linux-x64",
+			"node18-macos-x64",
+			"node18-win-x64"
+		],
+		"options": "no-warnings"
+	},
+	"files": [
+		"./build"
+	]
 }

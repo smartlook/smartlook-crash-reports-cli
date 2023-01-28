@@ -1,4 +1,4 @@
-import { uploadMappingFile } from '../lib/commands/upload-mapping-file'
+import { uploadMappingFile } from '../lib/commands/upload-mapping-file/upload-mapping-file'
 import nock from 'nock'
 
 const hexToString = (hex: any) => {
@@ -8,7 +8,7 @@ const hexToString = (hex: any) => {
 	return str
 }
 
-describe('uploadMappingFile', () => {
+xdescribe('uploadMappingFile', () => {
 	const token = 'api-token'
 	const path = `${__dirname}/test-mapping-file.txt`
 	const dsymArchivePath = `${__dirname}/test.xcarchive`

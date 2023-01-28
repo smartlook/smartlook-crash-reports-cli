@@ -1,3 +1,19 @@
 TAG=latest # todo read from package json
+
+build-all: build-binary
+
+build-ts:
+	npx rimraf build && npx tsc -b
+
+build-bundle: build-ts
+build-bundle:
+	npx rimraf dist
+	npx rollup --config rollup.config.js --bundleConfigAsCjs
+
+build-binary: build-bundle
+build-binary:
+	npx rimraf bin
+	npx pkg --output release/smartlook-crash-reports .
+
 build-docker:
 	docker build -t smartlook/smartlook-crash-cli-upload:$(TAG) .

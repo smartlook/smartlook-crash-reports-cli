@@ -1,68 +1,25 @@
 import * as commander from 'commander'
-import { uploadMappingFile } from './lib/commands/upload-mapping-file'
+import { commandDecorators } from './lib/commands'
+import { debug, error } from './lib/logger'
 
 const pjson = require('../package.json')
 
 async function run() {
 	const cmder = new commander.Command()
 
-	cmder
-		.version(pjson.version)
-		.name('smartlook-crash-cli-upload')
-		.alias('sccu')
-		.usage('[command] [options] ')
-		.on('--help', () => {
-			console.log('')
-			console.log('Aliases:')
-			console.log('  sccu')
-		})
+	debug('version: %s', pjson.version)
 
-	cmder
-		.command('upload-mapping-file')
-		.alias('umf')
-		.option(
-			'-a --apiHost <value>',
-			'URL of REST API for uploading mapping files',
-			process.env.API_HOST ?? 'https://api.smartlook.cloud'
-		)
-		.option(
-			'-p --path <value>',
-			'Path to mapping file to be uploaded - for iOS either path to.xcarchive or single dSYM file. Can be set as ENV variable PATH_TO_MAPING_FILE',
-			process.env.PATH_TO_MAPING_FILE
-		)
-		.option(
-			'-t --token <value>',
-			'API token to access Smartlook Public API. Can be set as ENV variable API_TOKEN',
-			process.env.API_TOKEN
-		)
-		.option(
-			'-b --bundleId <value>',
-			'BundleId of Application related to uploaded mapping file. Can be set as ENV variable BUNDLE_ID',
-			process.env.BUNDLE_ID
-		)
-		.option(
-			'-av --appVersion <value>',
-			'Version of Application related to uploaded mapping file. Can be set as ENV variable APP_VERSION',
-			process.env.APP_VERSION
-		)
-		.option(
-			'-pl --platform <value>',
-			'Platform of Application related to uploaded mapping file. Supported values are `android` and `ios`. Can be set as ENV variable PLATFORM',
-			process.env.PLATFORM
-		)
-		.option(
-			'-iv --internalVersion <value>',
-			'Internal version of Application related to uploaded mapping file. Can be set as ENV variable INTERNAL_APP_VERSION',
-			process.env.INTERNAL_APP_VERSION
-		)
-		.option(
-			'-f --force',
-			'Argument to force the mapping file upload',
-			process.env.FORCE
-		)
-		.action(uploadMappingFile)
+	cmder.version(pjson.version).name('smartlook').usage('[command] [options]')
+
+	for (const decorator of commandDecorators) {
+		decorator(cmder)
+	}
+
+	cmder.showHelpAfterError()
 
 	await cmder.parseAsync(process.argv)
 }
 
-export default run
+if (require.main) {
+	run()
+}
