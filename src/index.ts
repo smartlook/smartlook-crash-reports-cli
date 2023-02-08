@@ -11,8 +11,10 @@ async function run() {
 
 	debug('version: %s', pjson.version)
 
-	cmder.version(pjson.version).name('smartlook').usage('[command] [options]')
-	cmder.alias('smartlook-crash-reports')
+	cmder
+		.version(pjson.version)
+		.name('smartlook-crash-reports')
+		.usage('[command] [options]')
 	cmder.alias('slcr')
 
 	for (const decorator of commandDecorators) {
