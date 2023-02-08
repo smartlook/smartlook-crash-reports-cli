@@ -22,7 +22,7 @@ This is CLI tool that allows to upload various mapping files to Smartlook using 
 ### Usage
 
 ```
-smartlook-crash-reports-cli [command] [options]
+smartlook-crash-reports [command] [options]
 
 Options:
   -V, --version                      output the version number

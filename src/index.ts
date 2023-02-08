@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import * as commander from 'commander'
 import { commandDecorators } from './lib/commands'
 import { debug, error } from './lib/logger'
@@ -10,6 +12,8 @@ async function run() {
 	debug('version: %s', pjson.version)
 
 	cmder.version(pjson.version).name('smartlook').usage('[command] [options]')
+	cmder.alias('smartlook-crash-reports')
+	cmder.alias('slcr')
 
 	for (const decorator of commandDecorators) {
 		decorator(cmder)
