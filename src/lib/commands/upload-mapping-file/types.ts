@@ -23,12 +23,13 @@ export interface RequestOptions {
 	headers: Record<string, string>
 }
 
-export interface InfoPlistFile {
-	ApplicationProperties?: {
-		CFBundleIdentifier?: string
-		CFBundleShortVersionString?: string
-		CFBundleVersion?: string
-	}
+export interface IApplicationProperties {
+	CFBundleIdentifier?: string
+	CFBundleShortVersionString?: string
+	CFBundleVersion?: string
+}
+export interface IXCarchiveInfoPlistFile {
+	ApplicationProperties?: IApplicationProperties
 }
 
 export interface IUploadJobData {

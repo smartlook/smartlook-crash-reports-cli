@@ -13,7 +13,9 @@ build-bundle:
 build-binary: build-bundle
 build-binary:
 	npx rimraf bin
+	npx rimraf release
 	npx pkg --output release/smartlook-crash-reports .
+	cd release;tar -czvf smartlook-crash-reports.tar.gz *
 
 build-docker:
 	docker build -t smartlook/smartlook-crash-cli-upload:$(TAG) .

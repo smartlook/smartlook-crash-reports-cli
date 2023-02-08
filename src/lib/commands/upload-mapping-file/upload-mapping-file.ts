@@ -9,7 +9,8 @@ import {
 	AppIdentifiers,
 	CLIArgs,
 	IDSymInfo,
-	InfoPlistFile,
+	IXCarchiveInfoPlistFile,
+	IApplicationProperties,
 	RequestOptions,
 } from './types'
 import { uploadAndroid, uploadApple } from './uploaders'
@@ -38,15 +39,36 @@ function validateInput(args: CLIArgs) {
 }
 
 function validateAndAugmentArguments(args: CLIArgs) {
-	if (args.platform === 'apple' && isXcarchive(args.path)) {
-		const appIdentifiers = parseIdentifiersFromPlist(args.path)
+	if (args.platform === 'apple') {
+		const plistFiles = glob.sync('**/Info.plist', {
+			cwd: args.path,
+		})
 
-		info('Info.plist found - %j', appIdentifiers)
+		if (plistFiles.length > 0) {
+			plistFiles.sort((a, b) => a.length - b.length)
+			debug('following Info.plist files found: %j', plistFiles)
 
-		args = mergeArgs(args, appIdentifiers)
+			const plistPath = path.join(args.path, plistFiles[0])
+
+			debug('using following Info.plist file: %s', plistPath)
+
+			try {
+				const appIdentifiers = parseIdentifiersFromPlist(plistPath)
+
+				info('Info.plist found - %j', appIdentifiers)
+
+				args = mergeArgs(args, appIdentifiers)
+
+				debug('merged properties: %j', args)
+			} catch (err: any) {
+				error('cannot parse Info.plist - %s', err.message)
+			}
+		}
 	}
 
 	validateInput(args)
+
+	return args
 }
 
 function mergeArgs(args: CLIArgs, identifiers: AppIdentifiers | null): CLIArgs {
@@ -59,17 +81,30 @@ function mergeArgs(args: CLIArgs, identifiers: AppIdentifiers | null): CLIArgs {
 	}
 }
 
-function parseIdentifiersFromPlist(basePath: string): AppIdentifiers | null {
-	const infoPlistFile = fs.readFileSync(
-		path.resolve(process.cwd(), `${basePath}/Info.plist`)
-	)
+function isXCarchiveFile(
+	properties: unknown
+): properties is IXCarchiveInfoPlistFile {
+	return !!(properties as IXCarchiveInfoPlistFile).ApplicationProperties
+}
 
-	const parsed = plist.parse(infoPlistFile.toString()) as InfoPlistFile
+function parseIdentifiersFromPlist(plistPath: string): AppIdentifiers | null {
+	const infoPlistFile = fs.readFileSync(path.resolve(process.cwd(), plistPath))
+
+	const parsed = plist.parse(infoPlistFile.toString()) as
+		| IXCarchiveInfoPlistFile
+		| IApplicationProperties
+
+	const applicationProperties: IApplicationProperties | undefined =
+		isXCarchiveFile(parsed) ? parsed.ApplicationProperties : parsed
+
+	const APP_VERSION_KEY = 'CFBundleShortVersionString'
+	const INTERNAL_APP_VERSION_KEY = 'CFBundleVersion'
+	const BUNDLE_ID_KEY = 'CFBundleIdentifier'
 
 	return {
-		appVersion: parsed?.ApplicationProperties?.CFBundleShortVersionString,
-		internalAppVersion: parsed?.ApplicationProperties?.CFBundleVersion,
-		bundleId: parsed?.ApplicationProperties?.CFBundleIdentifier,
+		appVersion: applicationProperties?.[APP_VERSION_KEY],
+		internalAppVersion: applicationProperties?.[INTERNAL_APP_VERSION_KEY],
+		bundleId: applicationProperties?.[BUNDLE_ID_KEY],
 	}
 }
 
@@ -90,7 +125,11 @@ const uploadStrategies = {
 export async function uploadMappingFile(args: CLIArgs): Promise<void> {
 	info('preparing upload of the mapping files')
 
-	validateAndAugmentArguments(args)
+	args = validateAndAugmentArguments(args)
+
+	let uploadOptions: RequestOptions | null = await uploadStrategies[
+		args.platform
+	](args)
 
 	const publicApiUrl = buildApiURL(
 		args.apiHost,
@@ -98,10 +137,6 @@ export async function uploadMappingFile(args: CLIArgs): Promise<void> {
 		args.platform,
 		args.appVersion
 	)
-
-	let uploadOptions: RequestOptions | null = await uploadStrategies[
-		args.platform
-	](args)
 
 	if (uploadOptions) {
 		await upload(publicApiUrl, uploadOptions)
