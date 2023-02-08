@@ -1,6 +1,6 @@
-## Smartlook Crash CLI Upload
+## smartlook-crash-reports-cli
 
-Smartlook Crash CLI Upload is CLI tool that allows to upload source map file to S3 bucket using Smartlook REST API.
+This is CLI tool that allows to upload various mapping files to Smartlook using Smartlook REST API.
 
 ## Getting Started
 
@@ -13,16 +13,16 @@ Smartlook Crash CLI Upload is CLI tool that allows to upload source map file to 
 
 - with NPM
 
-  `npm install --location=global @smartlook/crash-cli-upload`
+  `npm install --location=global @smartlook/smartlook-crash-reports-cli`
 
 - with Yarn
 
-  `yarn global add @smartlook/crash-cli-upload`
+  `yarn global add @smartlook/smartlook-crash-reports-cli`
 
 ### Usage
 
 ```
-smartlook-crash-cli-upload [command] [options]
+smartlook-crash-reports-cli [command] [options]
 
 Options:
   -V, --version                      output the version number
@@ -31,15 +31,12 @@ Options:
 Commands:
   upload-mapping-file|umf [options]
   help [command]                     display help for command
-
-Aliases:
-  sccu
 ```
 
-#### Options for `smartlook-crash-cli-upload upload-mapping-file`
+#### Options for `smartlook-crash-reports-cli upload-mapping-file`
 
 ```
-Usage: smartlook-crash-cli-upload upload-mapping-file|umf [options]
+Usage: smartlook-crash-reports-cli upload-mapping-file|umf [options]
 
 Options:
   -p --path <value>              Path to mapping file to be uploaded - for Apple either path to.xcarchive or single dSYM file. Can be set as ENV variable PATH_TO_MAPING_FILE
@@ -51,5 +48,7 @@ Options:
   -h, --help                     display help for command
 
 Example:
-  smartlook-crash-cli-upload upload-mapping-file -t apiToken132456 -p mapping-file.txt -b prod -pl android -av 0.0.1 -iv build.1234
+  smartlook-crash-reports-cli upload-mapping-file -t <rest-api-token> -p mapping-file.txt -b com.example.app -pl android -av 0.0.1 -iv build.1234
+
+  smartlook-crash-reports-cli upload-mapping-file -t <rest-api-token> -p Example.dSYM -b com.example.app -pl apple -av 0.0.1 -iv build.1234
 ```
