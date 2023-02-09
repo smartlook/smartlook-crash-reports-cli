@@ -1,14 +1,10 @@
-import archiver from 'archiver'
 import * as fs from 'fs'
 import * as plist from 'plist'
 import * as path from 'node:path'
-import * as os from 'node:os'
-import { execSync } from 'node:child_process'
 import glob from 'glob'
 import {
 	AppIdentifiers,
 	CLIArgs,
-	IDSymInfo,
 	IXCarchiveInfoPlistFile,
 	IApplicationProperties,
 	RequestOptions,
@@ -16,7 +12,6 @@ import {
 import { uploadAndroid, uploadApple } from './uploaders'
 
 import { debug, error, info } from '../../logger'
-import { isXcarchive } from './helpers'
 import { upload } from './upload'
 import { ValidationError } from '../../ValidationError'
 

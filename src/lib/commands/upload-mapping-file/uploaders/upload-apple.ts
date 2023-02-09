@@ -8,7 +8,7 @@ import archiver from 'archiver'
 import FormData from 'form-data'
 
 import { error, info, debug } from '../../../logger'
-import { isXcarchive } from '../helpers'
+import { isDsym } from '../helpers'
 import { CLIArgs, IDSymInfo, RequestOptions } from '../types'
 
 function getDsymPaths(basePath: string): string[] {
@@ -113,10 +113,10 @@ function extractDsymInfo(dsymPath: string): IDSymInfo | null {
 async function extractAndPackDsyms(basePath: string) {
 	const dsymPaths: string[] = []
 
-	if (!isXcarchive(basePath)) {
+	if (isDsym(basePath)) {
 		dsymPaths.push(basePath)
 	} else {
-		info('.xcarchive detected - extracting dSYMs')
+		info('looking for dSYMs')
 
 		const discoveredDSyms = getDsymPaths(basePath)
 		dsymPaths.push(...discoveredDSyms)
