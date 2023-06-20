@@ -14,13 +14,20 @@ export async function upload(
 	debug('upload url: %s', uploadURL)
 
 	try {
-		const response = await axios.post(uploadURL, requestOptions.body, {
+		const response = await axios.request({
+			method: 'post',
+			url: uploadURL,
 			headers: requestOptions.headers,
+			data: requestOptions.body,
+			maxBodyLength: Infinity,
 		})
 
 		info('mapping files were uploaded')
 	} catch (err: any) {
 		error('upload failed: %s', err.message, err.code)
-		debug('upload error response: %s %j', err.message, err.response.data)
+
+		if (err.response) {
+			debug('upload error response: %s %j', err.message, err.response.data)
+		}
 	}
 }

@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 import * as commander from 'commander'
 import { commandDecorators } from './lib/commands'
 import { debug, error } from './lib/logger'
