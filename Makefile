@@ -10,6 +10,7 @@ build-bundle:
 	npx rimraf dist
 	npx rollup --config rollup.config.js --bundleConfigAsCjs
 	echo "#!/usr/bin/env node\n" `cat dist/index.js` > dist/index.js
+	chmod +x dist/index.js
 
 build-binary: build-bundle
 build-binary:
