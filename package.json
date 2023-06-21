@@ -1,6 +1,6 @@
 {
 	"name": "@smartlook/smartlook-crash-reports-cli",
-	"version": "2.1.7",
+	"version": "2.1.8",
 	"type": "commonjs",
 	"description": "CLI tool for uploading crash mapping files to the Smartlook.",
 	"repository": "git@github.com:smartlook/smartlook-crash-cli-upload.git",
