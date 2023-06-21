@@ -5,7 +5,7 @@
 	"description": "CLI tool for uploading crash mapping files to the Smartlook.",
 	"repository": "git@github.com:smartlook/smartlook-crash-cli-upload.git",
 	"author": "Jan Zaloudek (@smartlook), Patrik Laurinc (@smartlook)",
-	"main": "./build/index.js",
+	"main": "./dist/index.js",
 	"license": "MIT",
 	"scripts": {
 		"build": "make build-ts",
@@ -51,8 +51,8 @@
 		"typescript": "^4.9.4"
 	},
 	"bin": {
-		"smartlook-crash-reports": "./build/index.js",
-		"slcr": "./build/index.js"
+		"smartlook-crash-reports": "./dist/index.js",
+		"slcr": "./dist/index.js"
 	},
 	"pkg": {
 		"scripts": "dist/index.js",
